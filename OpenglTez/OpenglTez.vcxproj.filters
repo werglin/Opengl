@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{d1831809-16b0-4136-a812-bdf6c6bc2476}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{7ea301ad-d97b-4c8d-83a1-876d48b2b784}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{6492f1d3-cfc8-48cc-a153-a14462693ba6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fbx">
+      <UniqueIdentifier>{a27a918e-a9e4-4c79-bc76-e1daed49f549}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\shaders\simplevertex.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="assets\shaders\simplefragment.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="glfw3.dll" />
+    <None Include="assets\shaders\simplefragmentv2.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="Opengl\assets\shaders\simplefragment.glsl" />
+    <None Include="Opengl\assets\shaders\simplefragmentv2.glsl" />
+    <None Include="Opengl\assets\shaders\simplevertex.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\ShaderProgram.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Keyboard.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mouse.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Joystick.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Camera.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Window.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Texture.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Mesh.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Model.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Cube.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\textures\screenhider.png" />
+    <Image Include="assets\textures\tree-736885_640.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Window.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\Joystick.cpp" />
+    <ClCompile Include="src\Keyboard.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\Mouse.cpp" />
+    <ClCompile Include="src\ShaderProgram.cpp" />
+    <ClCompile Include="src\Texture.cpp" />
+  </ItemGroup>
+</Project>
