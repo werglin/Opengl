@@ -17,9 +17,14 @@ std::vector<struct Vertex> Vertex::GenList(float* vertices, int size_vertices)
 			vertices[i * stride + 1],
 			vertices[i * stride + 2]
 			);
-		ret[i].texCoord = glm::vec2(
+		ret[i].normal = glm::vec3(
 			vertices[i * stride + 3],
-			vertices[i * stride + 4]
+			vertices[i * stride + 4],
+			vertices[i * stride + 5]
+			);
+		ret[i].texCoord = glm::vec2(
+			vertices[i * stride + 6],
+			vertices[i * stride + 7]
 		);
 	}
 
@@ -27,20 +32,10 @@ std::vector<struct Vertex> Vertex::GenList(float* vertices, int size_vertices)
 }
 
 Mesh::Mesh(){}
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures, ShaderProgram* sp):
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures):
 	_vertices(vertices), _indices(indices), _textures(textures)
 {
 	Setup();
-	sp->Use();
-	int i;
-	for ( i = 0; i < _textures.size(); i++)
-	{
-		sp->AddUniformVariable(_textures[i]._name);
-		sp->SetInt(_textures[i]._name, i);
-
-	}
-	// frees vao on memory
-	glBindVertexArray(0);
 }
 
 void Mesh::Render(ShaderProgram* shader){
@@ -48,6 +43,7 @@ void Mesh::Render(ShaderProgram* shader){
 	shader->Use();
 	for (unsigned int i = 0; i < _textures.size(); i++)
 	{
+		shader->SetInt(_textures[i]._name, i);
 		_textures[i].Activate(GL_TEXTURE0 + i);
 		// if needed test
 		// int unit;
@@ -89,7 +85,12 @@ void Mesh::Setup(){
 	// set attrib pointer
 	// 3*sizeof(float) olmasý lazým çünkü 3 integer deðer döndürüyor
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, texCoord)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, normal)));
 
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, texCoord)));
+
+	// frees vao on memory
+	glBindVertexArray(0);
 
 }

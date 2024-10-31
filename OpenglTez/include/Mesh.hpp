@@ -10,8 +10,10 @@
 #include"ShaderProgram.hpp"
 #include"Texture.hpp"
 
+
 struct Vertex {
 	glm::vec3 pos;
+	glm::vec3 normal;
 	glm::vec2 texCoord;
 
 	static std::vector<struct Vertex> GenList(float* vertices, int size_vertices);
@@ -27,7 +29,7 @@ public:
 	std::vector<Texture> _textures;
 	
 	Mesh();
-	Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures, ShaderProgram* sp);
+	Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures);
 
 	void Render(ShaderProgram* shader);
 

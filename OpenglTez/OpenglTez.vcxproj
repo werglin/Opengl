@@ -135,6 +135,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="assets\shaders\lamp_fs.glsl" />
     <None Include="glfw3.dll" />
     <None Include="assets\shaders\simplefragment.glsl" />
     <None Include="assets\shaders\simplefragmentv2.glsl" />
@@ -145,11 +146,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Camera.hpp" />
-    <ClInclude Include="include\Cube.hpp" />
+    <ClInclude Include="include\Models\Cube.hpp" />
     <ClInclude Include="include\Joystick.hpp" />
     <ClInclude Include="include\Keyboard.hpp" />
+    <ClInclude Include="include\Material.hpp" />
     <ClInclude Include="include\Mesh.hpp" />
     <ClInclude Include="include\Model.hpp" />
+    <ClInclude Include="include\Models\Lamp.hpp" />
     <ClInclude Include="include\Mouse.hpp" />
     <ClInclude Include="include\ShaderProgram.hpp" />
     <ClInclude Include="include\Texture.hpp" />
@@ -165,6 +168,7 @@
     <ClCompile Include="src\Joystick.cpp" />
     <ClCompile Include="src\Keyboard.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Mouse.cpp" />

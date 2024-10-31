@@ -18,7 +18,8 @@
 #include"Camera.hpp"
 #include"Window.hpp"
 #include"Texture.hpp"
-#include"Cube.hpp"
+#include"Models/Cube.hpp"
+#include"Models/Lamp.hpp"
 
 Window window;
 
@@ -155,24 +156,28 @@ int main()
 
     window.SetParameters();
 
-    //Cube cube(glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(1.0f));
 
-    ShaderProgram *sp1, *sp2;
+    ShaderProgram *sp1, *sp2, *shaderLamp;
     sp1 = new ShaderProgram();
     sp2 = new ShaderProgram();
+    shaderLamp = new ShaderProgram();
 
-    sp1->AttachShader("assets/shaders/simplevertex.glsl", GL_VERTEX_SHADER);
-    sp1->AttachShader("assets/shaders/simplefragment.glsl", GL_FRAGMENT_SHADER);
-    sp1->Link();
+    //sp1->AttachShader("assets/shaders/simplevertex.glsl", GL_VERTEX_SHADER);
+    //sp1->AttachShader("assets/shaders/simplefragment.glsl", GL_FRAGMENT_SHADER);
+    //sp1->Link();
 
     sp2->AttachShader("assets/shaders/simplevertex.glsl", GL_VERTEX_SHADER);
     sp2->AttachShader("assets/shaders/simplefragmentv2.glsl", GL_FRAGMENT_SHADER);
     sp2->Link();
+
+    shaderLamp->AttachShader("assets/shaders/simplevertex.glsl", GL_VERTEX_SHADER);
+    shaderLamp->AttachShader("assets/shaders/lamp_fs.glsl", GL_FRAGMENT_SHADER);
+    shaderLamp->Link();
     // ------------------------------------
-    Texture tex1("screenhider.png", "texture1"), tex2("tree-736885_640.png", "texture2");
-    Model model;
-    model.Init();
-    model._meshes.push_back(Mesh(Vertex::GenList(vertices, 4), indicesVec, { tex1, tex2 }, sp2));
+    // Texture tex1("screenhider.png", "texture1"), tex2("tree-736885_640.png", "texture2");
+    // Model model;
+    // model.Init();
+    // model._meshes.push_back(Mesh(Vertex::GenList(vertices, 4), indicesVec, { tex1, tex2 }, sp2));
 
 
     glm::mat4 view = glm::mat4(1);
@@ -193,15 +198,13 @@ int main()
     */
 
     sp2->Use();
-    
-    sp2->AddUniformVariable("uTransform");
-    sp2->AddUniformVariable("uView");
-    sp2->AddUniformVariable("uProjection");
-    // cube.Init(*sp2);
 
     sp2->SetMat4("uView", view);
     sp2->SetMat4("uProjection", projection);
-    sp2->SetMat4("uTransform", glm::mat4(1));
+
+    shaderLamp->SetMat4("uView", view);
+    shaderLamp->SetMat4("uProjection", projection);
+    shaderLamp->SetMat4("uTransform", glm::mat4(1));
 
 
     mainJ.Update();
@@ -213,6 +216,13 @@ int main()
     {
         std::cout << "No joystick present"<<std::endl;
     }
+
+
+    Cube cube(Material::green_plastic, glm::vec3(-0.5f, 0.2f, -0.2f), glm::vec3(0.5));
+    cube.Init();
+    Lamp lamp(glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(1.0f), glm::vec3(-1.0f, -0.5f, -0.5f), glm::vec3(0.25f));
+    lamp.Init();
+
 
     lastframe = glfwGetTime();
     while (!window.ShouldClose())
@@ -241,19 +251,31 @@ int main()
         // draw shape
         sp2->Use();
 
+        sp2->SetVec3("light.pos", lamp.pos);
+        sp2->SetVec3("light.ambient", lamp._ambient);
+        sp2->SetVec3("light.diffuse", lamp._diffuse);
+        sp2->SetVec3("light.specular", lamp._diffuse);
+        sp2->SetVec3("viewPos", cameras[activeCam]._camPosition);
+
         view = cameras[activeCam].GetViewMatrix();
         projection = glm::perspective(glm::radians(cameras[activeCam]._zoom), float(Window::SRC_WIDTH) / float(Window::SRC_HEIGHT), 0.1f, 100.0f);
 
         sp2->SetMat4("uView", view);
         sp2->SetMat4("uProjection", projection);
 
-        // cube.Render(*sp2);
-        model.Render(sp2);
+        cube.Render(sp2);
+
+        shaderLamp->Use();
+        shaderLamp->SetMat4("uView", view);
+        shaderLamp->SetMat4("uProjection", projection);
+        lamp.Render(shaderLamp);
+        // model.Render(sp2);
 
         window.NewFrame();
     }
-    //cube.CleanUp();
-    model.CleanUp();
+    cube.CleanUp();
+    lamp.CleanUp();
+
     delete sp1;
     delete sp2;
     glfwTerminate();

@@ -36,14 +36,17 @@ void ShaderProgram::AttachShader(const char* filename, unsigned int shaderType)
 	glDeleteShader(shaderId);
 }
 
-unsigned int ShaderProgram::AddUniformVariable(const std::string& varName)
+void ShaderProgram::AddUniformVariable(const std::string& varName)
 {
 	this->_uniformTable[varName] = glGetUniformLocation(this->_programId, varName.c_str());
-	return GetUniformId(varName);
 }
 
 unsigned int ShaderProgram::GetUniformId(const std::string& varName)
 {
+	if (this->_uniformTable.count(varName) == 0)
+	{
+		AddUniformVariable(varName);
+	}
 	return this->_uniformTable[varName];
 }
 
@@ -54,12 +57,22 @@ unsigned int ShaderProgram::GetProgramId()
 
 void ShaderProgram::SetMat4(const std::string& varName, const glm::mat4& var)
 {
-	glUniformMatrix4fv(this->_uniformTable[varName], 1, GL_FALSE, (GLfloat*)& var);
+	glUniformMatrix4fv(GetUniformId(varName), 1, GL_FALSE, (GLfloat*)& var);
+}
+
+void ShaderProgram::SetVec3(const std::string& varName, const glm::vec3& var)
+{
+	glUniform3f(GetUniformId(varName), var.x, var.y, var.z);
 }
 
 void ShaderProgram::SetInt(const std::string& varName,const int& var)
 {
-	glUniform1i(this->_uniformTable[varName], var);
+	glUniform1i(GetUniformId(varName), var);
+}
+
+void ShaderProgram::SetFloat(const std::string& varName, const float& var)
+{
+	glUniform1f(GetUniformId(varName), var);
 }
 
 void ShaderProgram::Link()

@@ -28,6 +28,7 @@
     <None Include="Opengl\assets\shaders\simplefragment.glsl" />
     <None Include="Opengl\assets\shaders\simplefragmentv2.glsl" />
     <None Include="Opengl\assets\shaders\simplevertex.glsl" />
+    <None Include="assets\shaders\lamp_fs.glsl" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ShaderProgram.hpp">
@@ -57,9 +58,13 @@
     <ClInclude Include="include\Model.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Cube.hpp">
+    <ClInclude Include="include\Models\Cube.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Material.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Models\Lamp.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\textures\screenhider.png" />
@@ -77,5 +82,6 @@
     <ClCompile Include="src\Mouse.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
     <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\Material.cpp" />
   </ItemGroup>
 </Project>
