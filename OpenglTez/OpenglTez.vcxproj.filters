@@ -29,6 +29,7 @@
     <None Include="Opengl\assets\shaders\simplefragmentv2.glsl" />
     <None Include="Opengl\assets\shaders\simplevertex.glsl" />
     <None Include="assets\shaders\lamp_fs.glsl" />
+    <None Include="assimp-vc143-mtd.dll" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ShaderProgram.hpp">

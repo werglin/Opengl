@@ -136,6 +136,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="assets\shaders\lamp_fs.glsl" />
+    <None Include="assimp-vc143-mtd.dll" />
     <None Include="glfw3.dll" />
     <None Include="assets\shaders\simplefragment.glsl" />
     <None Include="assets\shaders\simplefragmentv2.glsl" />
