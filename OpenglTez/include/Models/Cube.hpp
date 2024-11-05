@@ -15,6 +15,11 @@ public:
 	glm::vec3 size = glm::vec3(1.0f);
     Material mat;
 
+    Cube()
+    { 
+        mat = Material::white_plastic;
+    }
+
 	Cube(Material mat,glm::vec3 pos, glm::vec3 size):pos(pos), size(size), mat(mat)
 	{
 
@@ -76,9 +81,9 @@ public:
         }
             
         
-        // Texture tex1("screenhider.png", "texture1"), tex2("tree-736885_640.png", "texture2");
+        // Texture tex1("screenhider.png", "uMaterial.diffuse_texture");//, tex2("tree-736885_640.png", "");
         // no texture for now
-        _meshes.push_back(Mesh(Vertex::GenList(vertices, size_vertices), indices, {}));
+        _meshes.push_back(Mesh(Vertex::GenList(vertices, size_vertices), indices, {  }));
 	}
 
     void Render(ShaderProgram* shader) {
@@ -87,10 +92,10 @@ public:
         transform = glm::scale(transform, size);
         //transform = glm::rotate(transform, float(glfwGetTime()) * glm::radians(-45.0f), glm::vec3(0.5f));
         shader->SetMat4("uTransform", transform);
-        shader->SetVec3("material.ambient", mat.ambient);
-        shader->SetVec3("material.diffuse", mat.diffuse);
-        shader->SetVec3("material.specular", mat.specular);
-        shader->SetFloat("material.smoothness", mat.smoothness);
+        shader->SetVec3("uMaterial.ambient", mat.ambient);
+        shader->SetVec3("uMaterial.diffuse", mat.diffuse);
+        shader->SetVec3("uMaterial.specular", mat.specular);
+        shader->SetFloat("uMaterial.smoothness", mat.smoothness);
         Model::Render(shader);
     }
 };

@@ -45,6 +45,9 @@ void Window::SetParameters()
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glEnable(GL_DEPTH_TEST);
+	// V Sync Level setter
+	glfwSwapInterval(0);
+	
 }
 
 void Window::Update()
