@@ -11,24 +11,21 @@ void PointLight::Render(ShaderProgram* sp, int idx)
 	sp->SetFloat(name + ".k1", _k1);
 	sp->SetFloat(name + ".k2", _k2);
 
-	sp->SetVec3(name + ".ambient", _ambient);
-	sp->SetVec3(name + ".diffuse", _diffuse);
-	sp->SetVec3(name + ".specular", _specular);
+	sp->SetVec4(name + ".ambient", _ambient);
+	sp->SetVec4(name + ".diffuse", _diffuse);
+	sp->SetVec4(name + ".specular", _specular);
 
 
 }
 
+#include<iostream>
 void DirectionLight::Render(ShaderProgram* sp)
 {
 	sp->SetVec3(_name + ".direction", _direction);
 
-	sp->SetFloat(_name + ".k0", _k0);
-	sp->SetFloat(_name + ".k1", _k1);
-	sp->SetFloat(_name + ".k2", _k2);
-
-	sp->SetVec3(_name + ".ambient", _ambient);
-	sp->SetVec3(_name + ".diffuse", _diffuse);
-	sp->SetVec3(_name + ".specular", _specular);
+	sp->SetVec4(_name + ".ambient", _ambient);
+	sp->SetVec4(_name + ".diffuse", _diffuse);
+	sp->SetVec4(_name + ".specular", _specular);
 
 
 }
@@ -46,7 +43,7 @@ void SpotLight::Render(ShaderProgram* sp, int idx)
 	sp->SetFloat(name + ".cutoff", _cutoff);
 	sp->SetFloat(name + ".outer_cutoff", _outerCutoff);
 
-	sp->SetVec3(name + ".ambient", _ambient);
-	sp->SetVec3(name + ".diffuse", _diffuse);
-	sp->SetVec3(name + ".specular", _specular);
+	sp->SetVec4(name + ".ambient", _ambient);
+	sp->SetVec4(name + ".diffuse", _diffuse);
+	sp->SetVec4(name + ".specular", _specular);
 }

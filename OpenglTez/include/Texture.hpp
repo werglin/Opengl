@@ -5,36 +5,28 @@
 
 
 #include<glad/glad.h>
+#include<assimp/scene.h>
 #include<string>
 
+class aiTexture;
 
 class Texture {
 public:
 	Texture();
-	Texture(const std::string& fileName, const std::string& shaderName, bool defaultParams = true);
+	Texture(std::string dir, std::string path, aiTextureType type);
 
 	void Generate();
 	void Load(bool flip = true);
-	
-	void SetFilters(GLenum all);
-	void SetFilters(GLenum mag, GLenum min);
-
-	void SetWrap(GLenum all);
-	void SetWrap(GLenum s, GLenum t);
+	void Load(const aiTexture* assimptexture);
 	
 	void Activate(GLenum level);
 
-	// texture object
-	int _id;
-	unsigned int _tex;
-	const std::string _name;
-	const std::string _path;
-private:
-	static int s_currentId;
-	static const std::string s_filepath;
-	int _width;
-	int _height;
-	int _nChannels;
+	void Cleanup();
+
+	unsigned int _id;
+	aiTextureType _type;
+	std::string _dir;
+	std::string _path;
 };
 
 #endif // !TEXTURE_hpp

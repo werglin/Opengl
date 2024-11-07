@@ -21,6 +21,7 @@
 #include"Models/Cube.hpp"
 #include"Models/Lamp.hpp"
 #include"Light.hpp"
+#include"Model.hpp"
 
 Window window;
 
@@ -164,14 +165,14 @@ int main()
     window.SetParameters();
 
 
-    ShaderProgram *sp1, *sp2, *shaderLamp;
-    sp1 = new ShaderProgram();
+    ShaderProgram* fbxshader, * sp2, * shaderLamp;
+    fbxshader = new ShaderProgram();
     sp2 = new ShaderProgram();
     shaderLamp = new ShaderProgram();
 
-    //sp1->AttachShader("assets/shaders/simplevertex.glsl", GL_VERTEX_SHADER);
-    //sp1->AttachShader("assets/shaders/simplefragment.glsl", GL_FRAGMENT_SHADER);
-    //sp1->Link();
+    fbxshader->AttachShader("assets/shaders/simplevertex.glsl", GL_VERTEX_SHADER);
+    fbxshader->AttachShader("assets/shaders/fbxshader_fs.glsl", GL_FRAGMENT_SHADER);
+    fbxshader->Link();
 
     sp2->AttachShader("assets/shaders/simplevertex.glsl", GL_VERTEX_SHADER);
     sp2->AttachShader("assets/shaders/simplefragmentv2.glsl", GL_FRAGMENT_SHADER);
@@ -180,11 +181,6 @@ int main()
     shaderLamp->AttachShader("assets/shaders/simplevertex.glsl", GL_VERTEX_SHADER);
     shaderLamp->AttachShader("assets/shaders/lamp_fs.glsl", GL_FRAGMENT_SHADER);
     shaderLamp->Link();
-    // ------------------------------------
-    // Texture tex1("screenhider.png", "texture1"), tex2("tree-736885_640.png", "texture2");
-    // Model model;
-    // model.Init();
-    // model._meshes.push_back(Mesh(Vertex::GenList(vertices, 4), indicesVec, { tex1, tex2 }, sp2));
 
 
     glm::mat4 view = glm::mat4(1);
@@ -193,16 +189,6 @@ int main()
     view = cameras[activeCam].GetViewMatrix();
     projection = glm::perspective(glm::radians(45.0f), float(Window::SRC_WIDTH) / float(Window::SRC_HEIGHT), 0.1f, 100.0f);
 
-    /*
-    sp1->Use();
-    sp1->AddUniformVariable("uTransform");
-    glUniformMatrix4fv(sp1->GetUniformId("uTransform"), 1, GL_FALSE, glm::value_ptr(transform));
-    
-    sp1->AddUniformVariable("uView");
-    glUniformMatrix4fv(sp1->GetUniformId("uView"), 1, GL_FALSE, glm::mat4(1));
-    sp1->AddUniformVariable("uProjection");
-    glUniformMatrix4fv(sp1->GetUniformId("uProjection"), 1, GL_FALSE, glm::value_ptr(transform));
-    */
 
     sp2->Use();
 
@@ -214,15 +200,17 @@ int main()
     shaderLamp->SetMat4("uTransform", glm::mat4(1));
 
 
-
-
-    // DirectionLight dirLight{glm::vec3(-10.0f, -10.0f, -10.3f),1.0f, 0.07f, 0.032f, glm::vec3(1.0f), glm::vec3(0.9f), glm::vec3(0.75f)};
+    DirectionLight dirLight;
+    dirLight._direction = glm::vec3(-0.2f, -0.9f, -0.2f);
+    dirLight._ambient = glm::vec4(1.0f);
+    dirLight._diffuse = glm::vec4(1.0f);
+    dirLight._specular = glm::vec4(0.7f);
 
     SpotLight spotLight{
         cameras[activeCam]._camPosition, cameras[activeCam]._camFront,
-        glm::cos(glm::radians(12.0f)), glm::cos(glm::radians(15.0f)),
+        glm::cos(glm::radians(6.0f)), glm::cos(glm::radians(8.0f)),
         1.0f, 0.07f, 0.032f,
-        glm::vec3(0.2f), glm::vec3(10.0f), glm::vec3(10.0f)
+        glm::vec4(0.2f,0.2f,0.2f,1.0f), glm::vec4(10.0f), glm::vec4(10.0f)
     };
 
     mainJ.Update();
@@ -261,15 +249,24 @@ int main()
             glm::vec3(-4.0f,  2.0f, -12.0f),
             glm::vec3(0.0f,  0.0f, -3.0f)
     };
-    Lamp lamps[4] = { Lamp(glm::vec3(1.0f), glm::vec3(0.5f), glm::vec3(0.8f), glm::vec3(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[0], glm::vec3(0.25f)),
-        Lamp(glm::vec3(1.0f), glm::vec3(0.5f), glm::vec3(0.8f), glm::vec3(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[1], glm::vec3(0.25f)),
-        Lamp(glm::vec3(1.0f), glm::vec3(0.5f), glm::vec3(0.8f), glm::vec3(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[2], glm::vec3(0.25f)),
-        Lamp(glm::vec3(1.0f), glm::vec3(0.5f), glm::vec3(0.8f), glm::vec3(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[3], glm::vec3(0.25f))
+    Lamp lamps[4] = { 
+        Lamp(glm::vec3(1.0f), glm::vec4(0.5f), glm::vec4(0.8f), glm::vec4(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[0], glm::vec3(0.25f)),
+        Lamp(glm::vec3(1.0f), glm::vec4(0.5f), glm::vec4(0.8f), glm::vec4(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[1], glm::vec3(0.25f)),
+        Lamp(glm::vec3(1.0f), glm::vec4(0.5f), glm::vec4(0.8f), glm::vec4(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[2], glm::vec3(0.25f)),
+        Lamp(glm::vec3(1.0f), glm::vec4(0.5f), glm::vec4(0.8f), glm::vec4(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[3], glm::vec3(0.25f)),
     };
     for (unsigned int i = 0; i < 4; i++) {
         //lamps[i] = Lamp(glm::vec3(1.0f), glm::vec3(0.05f), glm::vec3(0.8f), glm::vec3(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[i], glm::vec3(0.25f));
         lamps[i].Init();
     }
+
+
+
+    // fbx model
+    Model m(glm::vec3(0.0f,0.0f,-5.0f), glm::vec3(0.2f), false);
+    m.LoadModel("Punching.fbx");
+    // Model m(glm::vec3(0.0f,0.0f,-5.0f), glm::vec3(0.2f), true);
+    // m.LoadModel("Hip Hop Dancing.fbx");
 
 
     lastframe = glfwGetTime();
@@ -286,7 +283,6 @@ int main()
 
 
         /* 
-        sp1->Use();
 
         transform = glm::rotate(glm::mat4(1), glm::radians((float)glfwGetTime() / 5.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         glUniformMatrix4fv(sp1->GetUniformId("uTransform"), 1, GL_FALSE, glm::value_ptr(transform));
@@ -296,7 +292,7 @@ int main()
         */
 
 
-
+        // --- sp2 shader render
         // set default values for camera on 3d 
         sp2->Use();
         sp2->SetVec3("viewPos", cameras[activeCam]._camPosition);
@@ -308,8 +304,8 @@ int main()
         sp2->SetMat4("uProjection", projection);
 
         // render lights
-        // dirLight._direction = glm::vec3(glm::rotate(glm::mat4(1.0f), glm::radians(15.0f * deltatime), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::vec4(dirLight._direction, 1.0f));
-        // dirLight.Render(sp2);
+        dirLight._direction = glm::vec3(glm::rotate(glm::mat4(1.0f), glm::radians(15.0f * deltatime), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::vec4(dirLight._direction, 1.0f));
+        dirLight.Render(sp2);
 
         // point lights
         for (int i = 0; i < 4; i++)
@@ -321,7 +317,8 @@ int main()
         // spot lights
         if (flashLightOn)
         {
-            spotLight._position = cameras[activeCam]._camPosition - (cameras[activeCam]._camFront * 0.0f);
+            // dunno why but light moves more than cam like if we move 1,1 with cam - light moves 1.5,1.7 
+            spotLight._position = cameras[activeCam]._camPosition;
             spotLight._direction = cameras[activeCam]._camFront;
             spotLight.Render(sp2, 0);
             sp2->SetInt("countSpotLights", 1);
@@ -341,6 +338,9 @@ int main()
             cubes[i].Render(sp2);
         }
 
+        /* ------------------------------------- */
+
+        // --- shaderLamp shader render
         shaderLamp->Use();
         shaderLamp->SetMat4("uView", view);
         shaderLamp->SetMat4("uProjection", projection);
@@ -348,10 +348,54 @@ int main()
         {
             lamps[i].Render(shaderLamp);
         }
+        /*---------------------------------------------------*/
 
+        // --- fbxshader shader render
+
+        fbxshader->Use();
+        fbxshader->SetVec3("viewPos", cameras[activeCam]._camPosition);
+
+        view = cameras[activeCam].GetViewMatrix();
+        projection = glm::perspective(glm::radians(cameras[activeCam]._zoom), float(Window::SRC_WIDTH) / float(Window::SRC_HEIGHT), 0.1f, 100.0f);
+
+        fbxshader->SetMat4("uView", view);
+        fbxshader->SetMat4("uProjection", projection);
+
+        // render lights
+        dirLight._direction = glm::vec3(glm::rotate(glm::mat4(1.0f), glm::radians(15.0f * deltatime), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::vec4(dirLight._direction, 1.0f));
+        dirLight.Render(fbxshader);
+
+        // point lights
+        for (int i = 0; i < 4; i++)
+        {
+            lamps[i]._pointlight.Render(fbxshader, i);
+        }
+        fbxshader->SetInt("countPointLights", 4);
+
+        // spot lights
+        if (flashLightOn)
+        {
+            // dunno why but light moves more than cam like if we move 1,1 with cam - light moves 1.5,1.7 
+            spotLight._position = cameras[activeCam]._camPosition;
+            spotLight._direction = cameras[activeCam]._camFront;
+            spotLight.Render(fbxshader, 0);
+            fbxshader->SetInt("countSpotLights", 1);
+        }
+        else
+        {
+            fbxshader->SetInt("countSpotLights", 0);
+        }
+
+
+
+
+        // render meshes
+        m.Render(fbxshader);
 
         window.NewFrame();
     }
+
+    m.CleanUp();
 
     for (int i = 0; i < 10; i++)
     {
@@ -362,8 +406,10 @@ int main()
     {
         lamps[i].CleanUp();
     }
-
-    delete sp1;
+    fbxshader->CleanUp();
+    sp2->CleanUp();
+    shaderLamp->CleanUp();
+    delete fbxshader;
     delete sp2;
     delete shaderLamp;
     glfwTerminate();

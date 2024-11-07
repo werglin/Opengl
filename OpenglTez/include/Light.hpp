@@ -14,9 +14,9 @@ struct PointLight {
 	float _k1;
 	float _k2;
 
-	glm::vec3 _ambient;
-	glm::vec3 _diffuse;
-	glm::vec3 _specular;
+	glm::vec4 _ambient;
+	glm::vec4 _diffuse;
+	glm::vec4 _specular;
 
 	void Render(ShaderProgram* sp, int idx);
 
@@ -27,13 +27,9 @@ struct PointLight {
 struct DirectionLight {
 	glm::vec3 _direction;
 
-	float _k0;
-	float _k1;
-	float _k2;
-
-	glm::vec3 _ambient;
-	glm::vec3 _diffuse;
-	glm::vec3 _specular;
+	glm::vec4 _ambient;
+	glm::vec4 _diffuse;
+	glm::vec4 _specular;
 
 	void Render(ShaderProgram* sp);
 
@@ -51,9 +47,9 @@ struct SpotLight {
 	float _cutoff;
 	float _outerCutoff;
 
-	glm::vec3 _ambient;
-	glm::vec3 _diffuse;
-	glm::vec3 _specular;
+	glm::vec4 _ambient;
+	glm::vec4 _diffuse;
+	glm::vec4 _specular;
 
 	void Render(ShaderProgram* sp, int idx);
 

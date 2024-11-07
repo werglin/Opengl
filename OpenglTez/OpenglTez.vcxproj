@@ -135,6 +135,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="assets\fbx\Hip Hop Dancing.fbx" />
+    <None Include="assets\fbx\Punching.fbx" />
+    <None Include="assets\shaders\fbxshader_fs.glsl" />
     <None Include="assets\shaders\lamp_fs.glsl" />
     <None Include="assimp-vc143-mtd.dll" />
     <None Include="glfw3.dll" />

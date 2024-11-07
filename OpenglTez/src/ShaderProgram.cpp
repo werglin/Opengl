@@ -65,6 +65,11 @@ void ShaderProgram::SetVec3(const std::string& varName, const glm::vec3& var)
 	glUniform3f(GetUniformId(varName), var.x, var.y, var.z);
 }
 
+void ShaderProgram::SetVec4(const std::string& varName, const glm::vec4& var)
+{
+	glUniform4f(GetUniformId(varName), var.x, var.y, var.z, var.w);
+}
+
 void ShaderProgram::SetInt(const std::string& varName,const int& var)
 {
 	glUniform1i(GetUniformId(varName), var);
@@ -73,6 +78,11 @@ void ShaderProgram::SetInt(const std::string& varName,const int& var)
 void ShaderProgram::SetFloat(const std::string& varName, const float& var)
 {
 	glUniform1f(GetUniformId(varName), var);
+}
+
+void ShaderProgram::SetFloat4(const std::string& varName, aiColor4D color)
+{
+	glUniform4f(GetUniformId(varName), color.r, color.g, color.b, color.a);
 }
 
 void ShaderProgram::Link()
@@ -94,6 +104,11 @@ void ShaderProgram::Link()
 void ShaderProgram::Use()
 {
 	glUseProgram(this->_programId);
+}
+
+void ShaderProgram::CleanUp()
+{
+	glDeleteProgram(_programId);
 }
 
 std::string ShaderProgram::GetShaderFromFile(const char* filename)

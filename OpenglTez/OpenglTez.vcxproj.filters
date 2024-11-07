@@ -30,6 +30,9 @@
     <None Include="Opengl\assets\shaders\simplevertex.glsl" />
     <None Include="assets\shaders\lamp_fs.glsl" />
     <None Include="assimp-vc143-mtd.dll" />
+    <None Include="assets\fbx\Hip Hop Dancing.fbx" />
+    <None Include="assets\shaders\fbxshader_fs.glsl" />
+    <None Include="assets\fbx\Punching.fbx" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ShaderProgram.hpp">

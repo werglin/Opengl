@@ -32,24 +32,63 @@ std::vector<struct Vertex> Vertex::GenList(float* vertices, int size_vertices)
 }
 
 Mesh::Mesh(){}
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures):
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures) :
 	_vertices(vertices), _indices(indices), _textures(textures)
 {
+	noTex = false;
+	Setup();
+}
+
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, aiColor4D diffuse, aiColor4D specular) :
+	_vertices(vertices), _indices(indices),_diffuse(diffuse), _specular(specular)
+{
+	noTex = true;
 	Setup();
 }
 
 void Mesh::Render(ShaderProgram* shader){
 
-	shader->Use();
-	for (unsigned int i = 0; i < _textures.size(); i++)
-	{
-		shader->SetInt(_textures[i]._name, i);
-		_textures[i].Activate(GL_TEXTURE0 + i);
 		// if needed test
 		// int unit;
 		// glGetUniformiv(shader->GetProgramId(), glGetUniformLocation(shader->GetProgramId(), _textures[i]._name.c_str()), &unit);
 		// std::cout << "Uniform " << _textures[i]._name << " assigned to texture unit " << unit << std::endl;
+	if (noTex)
+	{
+		shader->SetVec4("uMaterial.ambient", glm::vec4(_material.ambient, 1.0f));
+		shader->SetFloat4("uMaterial.diffuse", _diffuse);
+		shader->SetFloat4("uMaterial.specular", _specular);
+		shader->SetFloat("uMaterial.smoothness", _material.smoothness);
+		shader->SetInt("noTex", 1);
 	}
+	else
+	{
+		shader->SetVec4("uMaterial.ambient", glm::vec4(_material.ambient, 1.0f));
+		shader->SetVec4("uMaterial.diffuse", glm::vec4(_material.diffuse, 1.0f));
+		shader->SetVec4("uMaterial.specular", glm::vec4(_material.specular, 1.0f));
+		shader->SetFloat("uMaterial.smoothness", _material.smoothness);
+		unsigned int diffuseIdx = 1;
+		unsigned int specIdx = 1;
+		shader->SetInt("noTex", 0);
+
+		for (unsigned int i = 0; i < _textures.size(); i++)
+		{
+			std::string name;
+			switch (_textures[i]._type)
+			{
+			case aiTextureType_DIFFUSE:
+				name = "diffuse_texture" + std::to_string(diffuseIdx++);
+				break;
+			case aiTextureType_SPECULAR:
+				name = "specular_texture" + std::to_string(specIdx++);
+			}
+			shader->SetInt(name, i);
+			//activate texture
+			_textures[i].Activate(GL_TEXTURE0 + i);
+		}
+	}
+
+	
+
 	glBindVertexArray(_vao);
 	glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
 	
@@ -59,6 +98,10 @@ void Mesh::Render(ShaderProgram* shader){
 
 void Mesh::CleanUp()
 {
+	for (int i = 0; i < _textures.size(); i++)
+	{
+		_textures[i].Cleanup();
+	}
 	glDeleteVertexArrays(1,&_vao);
 	glDeleteBuffers(1, &_vbo);
 	glDeleteBuffers(1, &_ebo);
