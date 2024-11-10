@@ -18,6 +18,7 @@ public:
 	bool Init();
 
 	void SetParameters();
+	void SetCursor(bool enabled);
 
 	// main loop
 	void Update();
@@ -25,6 +26,8 @@ public:
 
 	bool ShouldClose();
 	void SetShouldClose(bool shouldClose);
+
+	bool _cursorEnabled = true;
 
 private:
 	GLFWwindow* window;

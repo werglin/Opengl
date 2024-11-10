@@ -112,18 +112,32 @@ void processInput(double dt)
     {
         m.IncreaseBoneId();
     }
-    
-    double dx = Mouse::s_GetMouseDX(), dy = Mouse::s_GetMouseDY();
-    if (dx != 0 || dy != 0)
-    {
-        cameras[activeCam].UpdateCameraDirection(dx * dt * 150.0f, dy * dt* 150.0f);
-    }
 
-    double scroolDy = Mouse::s_GetScrollDY();
-    if (scroolDy != 0)
+    if (Mouse::s_ButtonDown(GLFW_MOUSE_BUTTON_2))
     {
-        cameras[activeCam].UpdateCameraZoom(scroolDy);
+        window.SetCursor(false); // disable cursor
     }
+    if (Mouse::s_ButtonUp(GLFW_MOUSE_BUTTON_2))
+    {
+        window.SetCursor(true); // enable cursor
+    }
+    
+
+    if (!window._cursorEnabled)
+    {
+        double dx = Mouse::s_GetMouseDX(), dy = Mouse::s_GetMouseDY();
+        if (dx != 0 || dy != 0)
+        {
+            cameras[activeCam].UpdateCameraDirection(dx * dt * 150.0f, dy * dt * 150.0f);
+        }
+
+        double scroolDy = Mouse::s_GetScrollDY();
+        if (scroolDy != 0)
+        {
+            cameras[activeCam].UpdateCameraZoom(scroolDy);
+        }
+    }
+    
 
 
     mainJ.Update();
@@ -282,10 +296,19 @@ int main()
 
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    float frametime = 1.0f / 144.0f; // fixed 144 fps
+    float passedtime = 0.0f;
     Time time;
     while (!window.ShouldClose())
     {
-        Time::s_deltaTime = time.ElapsedTimeInSeconds();
+        // fps limiter
+        if (passedtime < frametime)
+        {
+            passedtime += time.ElapsedTimeInSeconds();
+            continue;
+        }
+        Time::s_deltaTime = passedtime;
+        passedtime = 0.0f;
         
         processInput(Time::s_deltaTime);
 

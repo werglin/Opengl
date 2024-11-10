@@ -43,11 +43,25 @@ void Window::SetParameters()
 	glfwSetMouseButtonCallback(window, Mouse::s_MouseButtonCallback);
 	glfwSetScrollCallback(window, Mouse::s_MouseWheelCallback);
 
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	SetCursor(true);
+
 	glEnable(GL_DEPTH_TEST);
 	// V Sync Level setter
 	glfwSwapInterval(0);
 	
+}
+
+void Window::SetCursor(bool enabled)
+{
+	_cursorEnabled = enabled;
+	if (enabled)
+	{
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	}
+	else
+	{
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	}
 }
 
 void Window::Update()
