@@ -22,6 +22,7 @@
 #include"Models/Lamp.hpp"
 #include"Light.hpp"
 #include"Model.hpp"
+#include"Time.hpp"
 
 Window window;
 
@@ -61,9 +62,9 @@ Camera cameras[2] = {
 };
 
 int activeCam = 0;
-float deltatime;
-float lastframe;
 bool flashLightOn = false;
+
+Model m(glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.02f));
 
 void processInput(double dt)
 {
@@ -105,6 +106,12 @@ void processInput(double dt)
     {
         activeCam += (activeCam == 0) ? 1 : -1;
     }
+
+
+    if (Mouse::s_ButtonDown(GLFW_MOUSE_BUTTON_1))
+    {
+        m.IncreaseBoneId();
+    }
     
     double dx = Mouse::s_GetMouseDX(), dy = Mouse::s_GetMouseDY();
     if (dx != 0 || dy != 0)
@@ -143,6 +150,7 @@ std::string loadShaderSrc(const char* filename)
     return ret;
 }
 
+
 int main()
 {
 
@@ -170,7 +178,7 @@ int main()
     sp2 = new ShaderProgram();
     shaderLamp = new ShaderProgram();
 
-    fbxshader->AttachShader("assets/shaders/simplevertex.glsl", GL_VERTEX_SHADER);
+    fbxshader->AttachShader("assets/shaders/fbxshader_vs.glsl", GL_VERTEX_SHADER);
     fbxshader->AttachShader("assets/shaders/fbxshader_fs.glsl", GL_FRAGMENT_SHADER);
     fbxshader->Link();
 
@@ -263,20 +271,23 @@ int main()
 
 
     // fbx model
-    Model m(glm::vec3(0.0f,0.0f,-5.0f), glm::vec3(0.2f), false);
+    //Model m(glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.2f), false);
+    // Model m(glm::vec3(0.0f,0.0f,-5.0f), glm::vec3(0.2f), false);
     m.LoadModel("Punching.fbx");
+    // m.LoadModel("boneehehe.fbx");
+    // m.LoadModel("ggahahaxdlol.fbx");
     // Model m(glm::vec3(0.0f,0.0f,-5.0f), glm::vec3(0.2f), true);
     // m.LoadModel("Hip Hop Dancing.fbx");
-
-
-    lastframe = glfwGetTime();
     
+
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    Time time;
     while (!window.ShouldClose())
     {
-        double currentTime = glfwGetTime();
-        deltatime = currentTime - lastframe;
-        lastframe = currentTime;
-        processInput(deltatime);
+        Time::s_deltaTime = time.ElapsedTimeInSeconds();
+        
+        processInput(Time::s_deltaTime);
 
         window.Update();
         
@@ -304,7 +315,7 @@ int main()
         sp2->SetMat4("uProjection", projection);
 
         // render lights
-        dirLight._direction = glm::vec3(glm::rotate(glm::mat4(1.0f), glm::radians(15.0f * deltatime), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::vec4(dirLight._direction, 1.0f));
+        dirLight._direction = glm::vec3(glm::rotate(glm::mat4(1.0f), glm::radians(15.0f * Time::s_deltaTime), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::vec4(dirLight._direction, 1.0f));
         dirLight.Render(sp2);
 
         // point lights
@@ -353,6 +364,7 @@ int main()
         // --- fbxshader shader render
 
         fbxshader->Use();
+
         fbxshader->SetVec3("viewPos", cameras[activeCam]._camPosition);
 
         view = cameras[activeCam].GetViewMatrix();
@@ -362,7 +374,7 @@ int main()
         fbxshader->SetMat4("uProjection", projection);
 
         // render lights
-        dirLight._direction = glm::vec3(glm::rotate(glm::mat4(1.0f), glm::radians(15.0f * deltatime), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::vec4(dirLight._direction, 1.0f));
+        dirLight._direction = glm::vec3(glm::rotate(glm::mat4(1.0f), glm::radians(15.0f * Time::s_deltaTime), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::vec4(dirLight._direction, 1.0f));
         dirLight.Render(fbxshader);
 
         // point lights
@@ -388,7 +400,18 @@ int main()
 
 
 
+        fbxshader->SetInt("hasBones", m._hasAnims);
+        if (m._hasAnims)
+        {
+            std::vector<glm::mat4> Transforms;
+            m.GetBoneTransforms(time.ApplicationElapsedInSeconds(), Transforms);
 
+
+            for (unsigned int i = 0; i < Transforms.size(); i++) {
+                fbxshader->SetMat4("gBones[" + std::to_string(i) + "]", Transforms[i]);
+            }
+        }
+        
         // render meshes
         m.Render(fbxshader);
 

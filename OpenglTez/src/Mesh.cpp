@@ -31,18 +31,19 @@ std::vector<struct Vertex> Vertex::GenList(float* vertices, int size_vertices)
 	return ret;
 }
 
+
 Mesh::Mesh(){}
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures) :
-	_vertices(vertices), _indices(indices), _textures(textures)
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures, const std::vector<VertexBoneData>& vertexbonedata, bool hasBones) :
+	_vertices(vertices), _indices(indices), _textures(textures),_boneDatas(vertexbonedata), _hasBones(hasBones)
 {
-	noTex = false;
+	noEmbededTex = false;
 	Setup();
 }
 
-Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, aiColor4D diffuse, aiColor4D specular) :
-	_vertices(vertices), _indices(indices),_diffuse(diffuse), _specular(specular)
+Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, aiColor4D diffuse, aiColor4D specular, const std::vector<VertexBoneData>& vertexbonedata, bool hasBones) :
+	_vertices(vertices), _indices(indices),_diffuse(diffuse), _specular(specular), _boneDatas(vertexbonedata), _hasBones(hasBones)
 {
-	noTex = true;
+	noEmbededTex = true;
 	Setup();
 }
 
@@ -52,13 +53,13 @@ void Mesh::Render(ShaderProgram* shader){
 		// int unit;
 		// glGetUniformiv(shader->GetProgramId(), glGetUniformLocation(shader->GetProgramId(), _textures[i]._name.c_str()), &unit);
 		// std::cout << "Uniform " << _textures[i]._name << " assigned to texture unit " << unit << std::endl;
-	if (noTex)
+	if (noEmbededTex)
 	{
 		shader->SetVec4("uMaterial.ambient", glm::vec4(_material.ambient, 1.0f));
 		shader->SetFloat4("uMaterial.diffuse", _diffuse);
 		shader->SetFloat4("uMaterial.specular", _specular);
 		shader->SetFloat("uMaterial.smoothness", _material.smoothness);
-		shader->SetInt("noTex", 1);
+		shader->SetInt("noEmbededTex", 1);
 	}
 	else
 	{
@@ -68,7 +69,7 @@ void Mesh::Render(ShaderProgram* shader){
 		shader->SetFloat("uMaterial.smoothness", _material.smoothness);
 		unsigned int diffuseIdx = 1;
 		unsigned int specIdx = 1;
-		shader->SetInt("noTex", 0);
+		shader->SetInt("noEmbededTex", 0);
 
 		for (unsigned int i = 0; i < _textures.size(); i++)
 		{
@@ -87,14 +88,14 @@ void Mesh::Render(ShaderProgram* shader){
 		}
 	}
 
-	
-
 	glBindVertexArray(_vao);
 	glDrawElements(GL_TRIANGLES, _indices.size(), GL_UNSIGNED_INT, 0);
+
 	
 	glBindVertexArray(0);
 	glActiveTexture(GL_TEXTURE0);
 }
+
 
 void Mesh::CleanUp()
 {
@@ -105,9 +106,15 @@ void Mesh::CleanUp()
 	glDeleteVertexArrays(1,&_vao);
 	glDeleteBuffers(1, &_vbo);
 	glDeleteBuffers(1, &_ebo);
+
+	if(_hasBones)
+		glDeleteBuffers(1, &_bbo);
 }
 
 void Mesh::Setup(){
+	// frees vao on memory
+	glBindVertexArray(0);
+
 	glGenVertexArrays(1, &_vao);
 	glGenBuffers(1, &_vbo);
 	glGenBuffers(1, &_ebo);
@@ -133,7 +140,43 @@ void Mesh::Setup(){
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(offsetof(Vertex, texCoord)));
 
+	if (_hasBones)
+	{
+		glGenBuffers(1, &_bbo);
+
+		glBindBuffer(GL_ARRAY_BUFFER, _bbo);
+		glBufferData(GL_ARRAY_BUFFER, _boneDatas.size() * sizeof(VertexBoneData), &_boneDatas[0], GL_STATIC_DRAW);
+
+		// bone attrib
+		glEnableVertexAttribArray(3);
+		glVertexAttribIPointer(3, 4, GL_INT, sizeof(VertexBoneData), (void*)(offsetof(VertexBoneData, boneids)));
+
+		// weight attrib
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (void*)(offsetof(VertexBoneData, weights)));
+
+	}
+	else
+	{
+		glVertexAttribI4i(3, 0, 0, 0, 0);  // Default bone IDs
+		glVertexAttrib4f(4, 0.0f, 0.0f, 0.0f, 0.0f); // Default weights
+	}
+
+	
+
 	// frees vao on memory
 	glBindVertexArray(0);
 
+}
+
+void VertexBoneData::AddBoneData(unsigned int BoneID, float Weight)
+{
+	for (unsigned int i = 0; i < 4; i++) {
+		if (weights[i] == 0.0) {
+			boneids[i] = BoneID;
+			weights[i] = Weight;
+			//printf("Adding bone %d weight %f at index %i\n", BoneID, Weight, i);
+			return;
+		}
+	}
 }

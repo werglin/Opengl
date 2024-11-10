@@ -58,6 +58,8 @@ out vec4 FragColor;
 in vec3 o_normal;
 in vec3 o_fragPos;
 in vec2 o_texUV;
+flat in ivec4 o_boneids;
+in vec4 o_weights;
 
 // uniform sampler2D texture1;
 // uniform sampler2D texture2;
@@ -137,7 +139,10 @@ vec4 CalculateSpotlight(int idx, vec3 norm, vec3 viewDir, vec4 diffMap, vec4 spe
 
     return ambient;
 }
-uniform int noTex;
+uniform int noEmbededTex;
+
+
+uniform int uDisplayBoneIndex;
 
 void main()
 {
@@ -148,7 +153,7 @@ void main()
     vec4 diffMap = uMaterial.diffuse;
     vec4 specMap = uMaterial.specular;
 
-    if(noTex == 0) //  texture
+    if(noEmbededTex == 0) //  texture
     {
         specMap *= specTex;
         diffMap *= diffTex;
@@ -167,6 +172,29 @@ void main()
     {
         res+=  CalculateSpotlight(i,norm, viewDir, diffMap, specMap) ;
     }
+    bool found = false;
 
+    // for (int i = 0 ; i < 4 ; i++) {
+    //     if (o_boneids[i] == uDisplayBoneIndex) {
+    //        if (o_weights[i] >= 0.7) {
+    //            FragColor = vec4(1.0, 0.0, 0.0, 1.0) * o_weights[i];
+    //        } else if (o_weights[i] >= 0.4 && o_weights[i] <= 0.6) {
+    //            FragColor = vec4(0.0, 1.0, 0.0, 1.0) * o_weights[i];
+    //        } else if (o_weights[i] >= 0.01) {
+    //            FragColor = vec4(1.0, 1.0, 0.0, 1.0) * o_weights[i];
+    //        }
+    //        else
+    //        {
+    //         FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+    //        }
+    //        found = true;
+    //        break;
+    //     }
+    // }
+    // 
+    // if (!found ) {
+    //     FragColor = res;
+    // }
     FragColor = res;
+    
 } 

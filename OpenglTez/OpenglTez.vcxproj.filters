@@ -33,6 +33,9 @@
     <None Include="assets\fbx\Hip Hop Dancing.fbx" />
     <None Include="assets\shaders\fbxshader_fs.glsl" />
     <None Include="assets\fbx\Punching.fbx" />
+    <None Include="assets\shaders\fbxshader_vs.glsl" />
+    <None Include="assets\fbx\ggahahaxdlol.fbx" />
+    <None Include="assets\fbx\boneehehe.fbx" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ShaderProgram.hpp">
@@ -72,6 +75,9 @@
     <ClInclude Include="include\Light.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Time.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\textures\screenhider.png" />
@@ -91,5 +97,6 @@
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Material.cpp" />
     <ClCompile Include="src\Light.cpp" />
+    <ClCompile Include="src\Time.cpp" />
   </ItemGroup>
 </Project>

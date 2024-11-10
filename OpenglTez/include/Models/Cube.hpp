@@ -17,7 +17,10 @@ public:
 
 	Cube(Material mat = Material::white_plastic ,glm::vec3 pos = glm::vec3(0.0f), glm::vec3 size = glm::vec3(1.0f)) :Model(pos,size), pos(pos), size(size), mat(mat)
 	{
-
+        for (int i = 0; i < Model::_meshes.size(); i++)
+        {
+            Model::_meshes[i].name = "Cube";
+        }
 	}
 
 	void Init()

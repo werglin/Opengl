@@ -11,7 +11,6 @@
 #include"ShaderProgram.hpp"
 #include"Texture.hpp"
 
-
 struct Vertex {
 	glm::vec3 pos;
 	glm::vec3 normal;
@@ -21,10 +20,19 @@ struct Vertex {
 };
 typedef struct Vertex Vertex;
 
+struct VertexBoneData {
+	int boneids[4] = { -1 };
+	float weights[4] = { 0.0f };
+
+	void AddBoneData(unsigned int BoneID, float Weight);
+};
+typedef struct VertexBoneData VertexBoneData;
+
 class Mesh {
 public:
 	std::vector<Vertex> _vertices;
 	std::vector<unsigned int> _indices;
+	std::vector<VertexBoneData> _boneDatas;
 	unsigned int _vao;
 
 	Material _material;
@@ -34,17 +42,20 @@ public:
 	aiColor4D _specular;
 	
 	Mesh();
-	Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures = {});
-	Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, aiColor4D diffuse, aiColor4D specular);
+	Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, const std::vector<Texture>& textures = {}, const std::vector<VertexBoneData>& vertexbonedata = {}, bool hasBones = false);
+	Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices, aiColor4D diffuse, aiColor4D specular, const std::vector<VertexBoneData>& vertexbonedata = {},  bool hasBones = false);
 
 	void Render(ShaderProgram* shader);
 
 	void CleanUp();
-
+	std::string name;
 private:
+	bool _hasBones;
 	unsigned int _vbo, _ebo;
 
-	bool noTex;
+	unsigned int _bbo;
+
+	bool noEmbededTex;
 
 	void Setup();
 };

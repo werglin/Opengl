@@ -135,9 +135,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="assets\fbx\boneehehe.fbx" />
+    <None Include="assets\fbx\ggahahaxdlol.fbx" />
     <None Include="assets\fbx\Hip Hop Dancing.fbx" />
     <None Include="assets\fbx\Punching.fbx" />
     <None Include="assets\shaders\fbxshader_fs.glsl" />
+    <None Include="assets\shaders\fbxshader_vs.glsl" />
     <None Include="assets\shaders\lamp_fs.glsl" />
     <None Include="assimp-vc143-mtd.dll" />
     <None Include="glfw3.dll" />
@@ -161,6 +164,7 @@
     <ClInclude Include="include\Mouse.hpp" />
     <ClInclude Include="include\ShaderProgram.hpp" />
     <ClInclude Include="include\Texture.hpp" />
+    <ClInclude Include="include\Time.hpp" />
     <ClInclude Include="include\Window.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -180,6 +184,7 @@
     <ClCompile Include="src\Mouse.cpp" />
     <ClCompile Include="src\ShaderProgram.cpp" />
     <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\Time.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

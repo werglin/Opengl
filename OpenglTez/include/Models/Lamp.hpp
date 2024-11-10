@@ -25,6 +25,7 @@ public:
 		glm::vec3 pos,
 		glm::vec3 size) :_lightColor(lightcol), _pointlight({pos, k0,k1,k2, ambient, diffuse, specular}), Cube(Material::white_plastic, pos, size)
 	{
+		
 	}
 	//I know what I'm doing, compiler, use the default version.
 	Lamp(const Lamp&) = default;
