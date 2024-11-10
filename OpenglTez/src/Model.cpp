@@ -28,15 +28,8 @@ void Model::LoadModel(std::string name)
 	}
 	_hasAnims = pScene->HasAnimations();
 
-	aiMatrix4x4 m_GlobalInverseTransform = pScene->mRootNode->mTransformation;
-	m_GlobalInverseTransform = m_GlobalInverseTransform.Inverse();
-	for (int i = 0; i < 4; i++)
-	{
-		for (int j = 0; j < 4; j++)
-		{
-			this->m_GlobalInverseTransform[i][j] = m_GlobalInverseTransform[j][i];
-		}
-	}
+	this->m_GlobalInverseTransform = pScene->mRootNode->mTransformation.Inverse();
+
 
 	ProcessNode(pScene->mRootNode, pScene, name);
 }
@@ -81,7 +74,7 @@ void Model::GetBoneTransforms(float TimeInSeconds, std::vector<glm::mat4>& Trans
 
 	Transforms.resize(m_BoneInfo.size());
 
-	aiMatrix4x4 identity;
+	aiMatrix4x4 identity = aiMatrix4x4();
 
 
 	ReadNodeHierarchy(AnimationTimeTicks,pScene->mRootNode, identity);
