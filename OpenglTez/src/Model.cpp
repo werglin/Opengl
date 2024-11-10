@@ -304,20 +304,20 @@ void Model::ReadNodeHierarchy(float AnimationTime,const aiNode* pNode, const aiM
 			// Interpolate scaling and generate scaling transformation matrix
 			aiVector3D Scaling;
 			CalcInterpolatedScaling(Scaling, AnimationTime, pNodeAnim);
-			aiMatrix4x4 ScalingM;
+			aiMatrix4x4 ScalingM = aiMatrix4x4();
 			ScalingM[0][0] = Scaling.x;
-			ScalingM[1][1] = Scaling.x;
-			ScalingM[2][2] = Scaling.x;
+			ScalingM[1][1] = Scaling.y;
+			ScalingM[2][2] = Scaling.z;
 
 			// Interpolate rotation and generate rotation transformation matrix
-			aiQuaternion RotationQ;
+			aiQuaternion RotationQ = aiQuaternion();
 			CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
 			aiMatrix4x4 RotationM = aiMatrix4x4(RotationQ.GetMatrix());
 
 			// Interpolate translation and generate translation transformation matrix
 			aiVector3D Translation;
 			CalcInterpolatedPosition(Translation, AnimationTime, pNodeAnim);
-			aiMatrix4x4 TranslationM;
+			aiMatrix4x4 TranslationM = aiMatrix4x4();
 
 			TranslationM[0][3] = Translation.x;
 			TranslationM[1][3] = Translation.y;
