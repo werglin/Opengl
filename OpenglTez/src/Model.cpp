@@ -223,7 +223,7 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 
 			if (bone->mNumWeights > 0)
 			{
-				std::cout << "Bone id " << i << "  --  bone numweights  " << bone->mNumWeights << std::endl;
+				std::cout << "Bone id " << i  << " -- Bone name "<< bone->mName.C_Str() << "  --  Bone numWeights  " << bone->mNumWeights << std::endl;
 			}
 			for (unsigned int j = 0; j < bone->mNumWeights; j++)
 			{
@@ -306,6 +306,14 @@ void Model::ReadNodeHierarchy(float AnimationTime,const aiNode* pNode, const aiM
 			aiQuaternion RotationQ = aiQuaternion();
 			CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
 			aiMatrix4x4 RotationM = aiMatrix4x4(RotationQ.GetMatrix());
+			// sadece deneme amaçlý
+			// if (nodeTrans != aiMatrix4x4())
+			// {
+			// 
+			// 	aiMatrix4x4 temp = RotationM;
+			// 	aiMatrix4x4::RotationY(glm::radians(45.0f), temp);
+			// 	RotationM *= temp;
+			// }
 
 			// Interpolate translation and generate translation transformation matrix
 			aiVector3D Translation;
