@@ -214,7 +214,7 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 		int BoneId;
 		aiBone* bone;
 		bonedata.resize(vertices.size());
-		std::cout << bonedata.size()<<std::endl;
+		// std::cout << bonedata.size()<<std::endl;
 		for (unsigned int i = 0; i < mesh->mNumBones; i++)
 		{
 			bone = mesh->mBones[i];
