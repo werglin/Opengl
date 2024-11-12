@@ -292,10 +292,12 @@ int main()
     // m.LoadModel("ggahahaxdlol.fbx");
     // Model m(glm::vec3(0.0f,0.0f,-5.0f), glm::vec3(0.2f), true);
     // m.LoadModel("Hip Hop Dancing.fbx");
+
+
+
     
 
-    glEnable(GL_DEBUG_OUTPUT);
-    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    
     float frametime = 1.0f / 144.0f; // fixed 144 fps
     float passedtime = 0.0f;
     Time time;

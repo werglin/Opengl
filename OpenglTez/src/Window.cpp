@@ -3,6 +3,10 @@
 #include"Keyboard.hpp"
 #include"Mouse.hpp"
 
+#include"imgui/imgui.h"
+#include"imgui/imgui_impl_glfw.h"
+#include"imgui/imgui_impl_opengl3.h"
+
 unsigned int Window::SRC_WIDTH = 800;
 unsigned int Window::SRC_HEIGHT = 600;
 
@@ -30,7 +34,6 @@ bool Window::Init()
 	glfwMakeContextCurrent(this->window);
 	return true;
 }
-
 void Window::SetParameters()
 {
 	glViewport(0, 0, SRC_WIDTH, SRC_HEIGHT);
@@ -45,6 +48,8 @@ void Window::SetParameters()
 
 	SetCursor(true);
 
+	// glEnable(GL_DEBUG_OUTPUT);
+	// glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	glEnable(GL_DEPTH_TEST);
 	// V Sync Level setter
 	glfwSwapInterval(0);
