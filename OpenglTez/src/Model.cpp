@@ -19,6 +19,13 @@ void Model::Init()
 void Model::LoadModel(std::string name)
 {
 	Importer = new Assimp::Importer();
+	// this link explains the problem with assimp .fbx importer 
+	// https://github.com/assimp/assimp/issues/4620
+
+	// set this to properly import mixamo rig
+	Importer->SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+
+
 	this->pScene= Importer->ReadFile(cs_directory + name, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices);
 
 	if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode)
@@ -68,16 +75,13 @@ void Model::GetBoneTransforms(float TimeInSeconds, std::vector<glm::mat4>& Trans
 		float TimeInTicks = TimeInSeconds * TicksPerSecond;
 	    AnimationTimeTicks = fmod(TimeInTicks, (float)pScene->mAnimations[0]->mDuration);
 	}
-	
-
-	// std::cout << AnimationTimeTicks << " -- " << TimeInSeconds<<std::endl;
 
 	Transforms.resize(m_BoneInfo.size());
 
 	aiMatrix4x4 identity = aiMatrix4x4();
 
 
-	ReadNodeHierarchy(AnimationTimeTicks,pScene->mRootNode, identity);
+	ReadNodeHierarchy(AnimationTimeTicks,pScene->mRootNode, identity, 0);
 
 	for (unsigned int i = 0; i < m_BoneInfo.size(); i++) {
 
@@ -221,10 +225,10 @@ Mesh Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 				m_BoneInfo.push_back(bi);
 			}
 
-			if (bone->mNumWeights > 0)
-			{
-				std::cout << "Bone id " << i  << " -- Bone name "<< bone->mName.C_Str() << "  --  Bone numWeights  " << bone->mNumWeights << std::endl;
-			}
+			// if (bone->mNumWeights > 0)
+			// {
+			// 	std::cout << "Bone id " << i  << " -- Bone name "<< bone->mName.C_Str() << "  --  Bone numWeights  " << bone->mNumWeights << std::endl;
+			// }
 			for (unsigned int j = 0; j < bone->mNumWeights; j++)
 			{
 				const aiVertexWeight& vw = bone->mWeights[j];
@@ -282,11 +286,18 @@ std::vector<Texture> Model::LoadTextures(aiMaterial* mat, aiTextureType type, co
 	return textures;
 }
 
-void Model::ReadNodeHierarchy(float AnimationTime,const aiNode* pNode, const aiMatrix4x4& ParentTransform)
+void Model::ReadNodeHierarchy(float AnimationTime,const aiNode* pNode, const aiMatrix4x4& ParentTransform, int level)
 {
 	std::string NodeName(pNode->mName.data);
 
 	aiMatrix4x4 nodeTrans = pNode->mTransformation;
+
+	// check for node hierarchy
+	// for (int i = 0; i < level; i++)
+	// {
+	// 	std::cout << "   ";
+	// }
+	// std::cout << NodeName << std::endl;
 
 	if (_hasAnims)
 	{
@@ -306,14 +317,6 @@ void Model::ReadNodeHierarchy(float AnimationTime,const aiNode* pNode, const aiM
 			aiQuaternion RotationQ = aiQuaternion();
 			CalcInterpolatedRotation(RotationQ, AnimationTime, pNodeAnim);
 			aiMatrix4x4 RotationM = aiMatrix4x4(RotationQ.GetMatrix());
-			// sadece deneme amaçlý
-			// if (nodeTrans != aiMatrix4x4())
-			// {
-			// 
-			// 	aiMatrix4x4 temp = RotationM;
-			// 	aiMatrix4x4::RotationY(glm::radians(45.0f), temp);
-			// 	RotationM *= temp;
-			// }
 
 			// Interpolate translation and generate translation transformation matrix
 			aiVector3D Translation;
@@ -342,7 +345,7 @@ void Model::ReadNodeHierarchy(float AnimationTime,const aiNode* pNode, const aiM
 	}
 
 	for (unsigned int i = 0; i < pNode->mNumChildren; i++) {
-		ReadNodeHierarchy(AnimationTime,pNode->mChildren[i], GlobalTransformation);
+		ReadNodeHierarchy(AnimationTime,pNode->mChildren[i], GlobalTransformation, level+1);
 	}
 }
 
