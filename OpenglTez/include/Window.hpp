@@ -29,8 +29,8 @@ public:
 
 	bool _cursorEnabled = true;
 
-private:
 	GLFWwindow* window;
+
 };
 
 #endif // !WINDOW_hpp

@@ -13,6 +13,7 @@
 
 class Model {
 public:
+	std::string _name;
 	glm::vec3 _pos;
 	glm::vec3 _size;
 	bool _hasAnims;
@@ -23,9 +24,11 @@ public:
 	void LoadModel(std::string name);
 	void IncreaseBoneId();
 	void Render(ShaderProgram* shader);
-	void GetBoneTransforms(float TimeInSeconds,std::vector<glm::mat4>& Transforms);
+	void GetBoneTransforms(float TimeInSeconds,std::vector<glm::mat4>& Transforms, int animidx);
 	void CleanUp();
 
+	Assimp::Importer* Importer = NULL;
+	const aiScene* pScene = NULL;
 protected:
 
 	const static std::string cs_directory;
@@ -47,7 +50,7 @@ private:
 		to[0][3] = from.d1; to[1][3] = from.d2; to[2][3] = from.d3; to[3][3] = from.d4;
 		return to;
 	}
-	void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const aiMatrix4x4& ParentTransform, int level);
+	void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const aiMatrix4x4& ParentTransform, int level, int animidx);
 	struct BoneInfo
 	{
 		aiMatrix4x4 OffsetMatrix;
@@ -60,8 +63,6 @@ private:
 		}
 	};
 
-	Assimp::Importer* Importer = NULL;
-	const aiScene* pScene = NULL;
 
 	int activebone = 0;
 

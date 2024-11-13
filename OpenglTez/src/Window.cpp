@@ -3,12 +3,8 @@
 #include"Keyboard.hpp"
 #include"Mouse.hpp"
 
-#include"imgui/imgui.h"
-#include"imgui/imgui_impl_glfw.h"
-#include"imgui/imgui_impl_opengl3.h"
-
-unsigned int Window::SRC_WIDTH = 800;
-unsigned int Window::SRC_HEIGHT = 600;
+unsigned int Window::SRC_WIDTH = 1600;
+unsigned int Window::SRC_HEIGHT = 900;
 
 void Window::FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
@@ -47,6 +43,7 @@ void Window::SetParameters()
 	glfwSetScrollCallback(window, Mouse::s_MouseWheelCallback);
 
 	SetCursor(true);
+
 
 	// glEnable(GL_DEBUG_OUTPUT);
 	// glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);

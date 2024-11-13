@@ -6,6 +6,8 @@
 #include<fstream>
 #include<sstream>
 #include<streambuf>
+#include<filesystem>
+//  std::filesystem; needs c++ 17 
 
 #include<glm/mat4x4.hpp>
 #include<glm/gtc/matrix_transform.hpp>
@@ -23,6 +25,13 @@
 #include"Light.hpp"
 #include"Model.hpp"
 #include"Time.hpp"
+#include"Transform.hpp"
+
+
+#include"imgui/imgui.h"
+#include"imgui/imgui_impl_glfw.h"
+#include"imgui/imgui_impl_opengl3.h"
+
 
 Window window;
 
@@ -62,9 +71,32 @@ Camera cameras[2] = {
 };
 
 int activeCam = 0;
+int activeModel = 0;
+int activeAnim = 0;
 bool flashLightOn = false;
 
-Model m(glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.02f));
+// Model m(glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.02f));
+
+std::vector<Model> _loadedModels;
+std::vector<Transform> _transforms;
+
+
+void LoadModels()
+{
+    
+    std::string path = "assets/fbx/";
+    // std::vector<std::string> filenames;
+    for (const auto& entry : std::filesystem::directory_iterator(path))
+    {
+        // filenames.push_back(entry.path().filename().string());
+        _transforms.push_back(Transform());
+        _transforms[_transforms.size() - 1].setPosition(glm::vec3(0.0f, 0.0f, -5.0f));
+        _transforms[_transforms.size() - 1].setScale(glm::vec3(2.0f));
+
+        _loadedModels.push_back(Model());
+        _loadedModels[_loadedModels.size() - 1].LoadModel(entry.path().filename().string());
+    }
+}
 
 void processInput(double dt)
 {
@@ -108,11 +140,16 @@ void processInput(double dt)
     }
 
 
-    if (Mouse::s_ButtonDown(GLFW_MOUSE_BUTTON_1))
-    {
-        m.IncreaseBoneId();
-    }
-
+    // if (Mouse::s_ButtonDown(GLFW_MOUSE_BUTTON_1))
+    // {
+    //     // m.IncreaseBoneId();
+    //     activeModel++;
+    //     if (activeModel == _loadedModels.size())
+    //     {
+    //         activeModel = 0;
+    //     }
+    // }
+    // 
     if (Mouse::s_ButtonDown(GLFW_MOUSE_BUTTON_2))
     {
         window.SetCursor(false); // disable cursor
@@ -167,8 +204,6 @@ std::string loadShaderSrc(const char* filename)
 
 int main()
 {
-
-
     if (!glfwInit())
         return -1;
 
@@ -187,19 +222,19 @@ int main()
     window.SetParameters();
 
 
-    ShaderProgram* fbxshader, * sp2, * shaderLamp;
+    ShaderProgram* fbxshader, * shaderLamp;// * sp2;
     fbxshader = new ShaderProgram();
-    sp2 = new ShaderProgram();
+    // sp2 = new ShaderProgram();
     shaderLamp = new ShaderProgram();
 
     fbxshader->AttachShader("assets/shaders/fbxshader_vs.glsl", GL_VERTEX_SHADER);
     fbxshader->AttachShader("assets/shaders/fbxshader_fs.glsl", GL_FRAGMENT_SHADER);
     fbxshader->Link();
 
-    sp2->AttachShader("assets/shaders/simplevertex.glsl", GL_VERTEX_SHADER);
-    sp2->AttachShader("assets/shaders/simplefragmentv2.glsl", GL_FRAGMENT_SHADER);
-    sp2->Link();
-
+    // sp2->AttachShader("assets/shaders/simplevertex.glsl", GL_VERTEX_SHADER);
+    // sp2->AttachShader("assets/shaders/simplefragmentv2.glsl", GL_FRAGMENT_SHADER);
+    // sp2->Link();
+    // 
     shaderLamp->AttachShader("assets/shaders/simplevertex.glsl", GL_VERTEX_SHADER);
     shaderLamp->AttachShader("assets/shaders/lamp_fs.glsl", GL_FRAGMENT_SHADER);
     shaderLamp->Link();
@@ -212,11 +247,11 @@ int main()
     projection = glm::perspective(glm::radians(45.0f), float(Window::SRC_WIDTH) / float(Window::SRC_HEIGHT), 0.1f, 100.0f);
 
 
-    sp2->Use();
-
-    sp2->SetMat4("uView", view);
-    sp2->SetMat4("uProjection", projection);
-
+    // sp2->Use();
+    // 
+    // sp2->SetMat4("uView", view);
+    // sp2->SetMat4("uProjection", projection);
+    // 
     shaderLamp->SetMat4("uView", view);
     shaderLamp->SetMat4("uProjection", projection);
     shaderLamp->SetMat4("uTransform", glm::mat4(1));
@@ -245,26 +280,26 @@ int main()
         std::cout << "No joystick present"<<std::endl;
     }
 
-
-    glm::vec3 cubePositions[] = {
-        glm::vec3(0.0f,  0.0f,  0.0f),
-        glm::vec3(2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3(2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3(1.3f, -2.0f, -2.5f),
-        glm::vec3(1.5f,  2.0f, -2.5f),
-        glm::vec3(1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
-    };
-
-    Cube cubes[10];
-    for (unsigned int i = 0; i < 10; i++) {
-        cubes[i] = Cube(Material::green_rubber, cubePositions[i], glm::vec3(1.0f));
-        cubes[i].Init();
-    }
-
+    // 
+    // glm::vec3 cubePositions[] = {
+    //     glm::vec3(0.0f,  0.0f,  0.0f),
+    //     glm::vec3(2.0f,  5.0f, -15.0f),
+    //     glm::vec3(-1.5f, -2.2f, -2.5f),
+    //     glm::vec3(-3.8f, -2.0f, -12.3f),
+    //     glm::vec3(2.4f, -0.4f, -3.5f),
+    //     glm::vec3(-1.7f,  3.0f, -7.5f),
+    //     glm::vec3(1.3f, -2.0f, -2.5f),
+    //     glm::vec3(1.5f,  2.0f, -2.5f),
+    //     glm::vec3(1.5f,  0.2f, -1.5f),
+    //     glm::vec3(-1.3f,  1.0f, -1.5f)
+    // };
+    // 
+    // Cube cubes[10];
+    // for (unsigned int i = 0; i < 10; i++) {
+    //     cubes[i] = Cube(Material::green_rubber, cubePositions[i], glm::vec3(1.0f));
+    //     cubes[i].Init();
+    // }
+    // 
     glm::vec3 pointLightPositions[] = {
             glm::vec3(0.7f,  0.2f,  2.0f),
             glm::vec3(2.3f, -3.3f, -4.0f),
@@ -272,10 +307,10 @@ int main()
             glm::vec3(0.0f,  0.0f, -3.0f)
     };
     Lamp lamps[4] = { 
-        Lamp(glm::vec3(1.0f), glm::vec4(0.5f), glm::vec4(0.8f), glm::vec4(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[0], glm::vec3(0.25f)),
-        Lamp(glm::vec3(1.0f), glm::vec4(0.5f), glm::vec4(0.8f), glm::vec4(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[1], glm::vec3(0.25f)),
-        Lamp(glm::vec3(1.0f), glm::vec4(0.5f), glm::vec4(0.8f), glm::vec4(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[2], glm::vec3(0.25f)),
-        Lamp(glm::vec3(1.0f), glm::vec4(0.5f), glm::vec4(0.8f), glm::vec4(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[3], glm::vec3(0.25f)),
+        Lamp(glm::vec3(1.0f), glm::vec4(0.5f), glm::vec4(0.8f), glm::vec4(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[0], glm::vec3(25.0f)),
+        Lamp(glm::vec3(1.0f), glm::vec4(0.5f), glm::vec4(0.8f), glm::vec4(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[1], glm::vec3(25.0f)),
+        Lamp(glm::vec3(1.0f), glm::vec4(0.5f), glm::vec4(0.8f), glm::vec4(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[2], glm::vec3(25.0f)),
+        Lamp(glm::vec3(1.0f), glm::vec4(0.5f), glm::vec4(0.8f), glm::vec4(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[3], glm::vec3(25.0f)),
     };
     for (unsigned int i = 0; i < 4; i++) {
         //lamps[i] = Lamp(glm::vec3(1.0f), glm::vec3(0.05f), glm::vec3(0.8f), glm::vec3(1.0f), 1.0f, 0.07f, 0.032f, pointLightPositions[i], glm::vec3(0.25f));
@@ -287,7 +322,7 @@ int main()
     // fbx model
     //Model m(glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.2f), false);
     // Model m(glm::vec3(0.0f,0.0f,-5.0f), glm::vec3(0.2f), false);
-    m.LoadModel("Punching.fbx");
+    // m.LoadModel("Punching.fbx");
     // m.LoadModel("boneehehe.fbx");
     // m.LoadModel("ggahahaxdlol.fbx");
     // Model m(glm::vec3(0.0f,0.0f,-5.0f), glm::vec3(0.2f), true);
@@ -295,7 +330,13 @@ int main()
 
 
 
-    
+    LoadModels();
+
+
+    ImGuiContext* _pImguiContext = ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(window.window, true);
+    ImGui_ImplOpenGL3_Init();
+    ImGui::StyleColorsDark();
 
     
     float frametime = 1.0f / 144.0f; // fixed 144 fps
@@ -316,6 +357,9 @@ int main()
 
         window.Update();
         
+        
+
+
 
 
         /* 
@@ -327,52 +371,52 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 3);
         */
 
-
+        /*
         // --- sp2 shader render
         // set default values for camera on 3d 
-        sp2->Use();
-        sp2->SetVec3("viewPos", cameras[activeCam]._camPosition);
-
-        view = cameras[activeCam].GetViewMatrix();
-        projection = glm::perspective(glm::radians(cameras[activeCam]._zoom), float(Window::SRC_WIDTH) / float(Window::SRC_HEIGHT), 0.1f, 100.0f);
-
-        sp2->SetMat4("uView", view);
-        sp2->SetMat4("uProjection", projection);
-
-        // render lights
-        dirLight._direction = glm::vec3(glm::rotate(glm::mat4(1.0f), glm::radians(15.0f * Time::s_deltaTime), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::vec4(dirLight._direction, 1.0f));
-        dirLight.Render(sp2);
-
-        // point lights
-        for (int i = 0; i < 4; i++)
-        {
-            lamps[i]._pointlight.Render(sp2, i);
-        }
-        sp2->SetInt("countPointLights", 4);
-
-        // spot lights
-        if (flashLightOn)
-        {
-            // dunno why but light moves more than cam like if we move 1,1 with cam - light moves 1.5,1.7 
-            spotLight._position = cameras[activeCam]._camPosition;
-            spotLight._direction = cameras[activeCam]._camFront;
-            spotLight.Render(sp2, 0);
-            sp2->SetInt("countSpotLights", 1);
-        }
-        else
-        {
-            sp2->SetInt("countSpotLights", 0);
-        }
-
+        // sp2->Use();
+        // sp2->SetVec3("viewPos", cameras[activeCam]._camPosition);
+        // 
+        // view = cameras[activeCam].GetViewMatrix();
+        // projection = glm::perspective(glm::radians(cameras[activeCam]._zoom), float(Window::SRC_WIDTH) / float(Window::SRC_HEIGHT), 0.1f, 100.0f);
+        // 
+        // sp2->SetMat4("uView", view);
+        // sp2->SetMat4("uProjection", projection);
+        // 
+        // // render lights
+        // dirLight._direction = glm::vec3(glm::rotate(glm::mat4(1.0f), glm::radians(15.0f * Time::s_deltaTime), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::vec4(dirLight._direction, 1.0f));
+        // dirLight.Render(sp2);
+        // 
+        // // point lights
+        // for (int i = 0; i < 4; i++)
+        // {
+        //     lamps[i]._pointlight.Render(sp2, i);
+        // }
+        // sp2->SetInt("countPointLights", 4);
+        // 
+        // // spot lights
+        // if (flashLightOn)
+        // {
+        //     // dunno why but light moves more than cam like if we move 1,1 with cam - light moves 1.5,1.7 
+        //     spotLight._position = cameras[activeCam]._camPosition;
+        //     spotLight._direction = cameras[activeCam]._camFront;
+        //     spotLight.Render(sp2, 0);
+        //     sp2->SetInt("countSpotLights", 1);
+        // }
+        // else
+        // {
+        //     sp2->SetInt("countSpotLights", 0);
+        // }
+        */
 
 
 
         // render meshes
 
-        for (int i = 0; i < 10; i++)
-        {
-            cubes[i].Render(sp2);
-        }
+        // for (int i = 0; i < 10; i++)
+        // {
+        //     cubes[i].Render(sp2);
+        // }
 
         /* ------------------------------------- */
 
@@ -425,11 +469,14 @@ int main()
 
 
 
-        fbxshader->SetInt("hasBones", m._hasAnims);
-        if (m._hasAnims)
+        fbxshader->SetInt("hasBones", _loadedModels[activeModel]._hasAnims);
+        _loadedModels[activeModel]._pos = _transforms[activeModel].getPosition();
+        _loadedModels[activeModel]._size = _transforms[activeModel].getScale();
+
+        if (_loadedModels[activeModel]._hasAnims)
         {
             std::vector<glm::mat4> Transforms;
-            m.GetBoneTransforms(time.ApplicationElapsedInSeconds(), Transforms);
+            _loadedModels[activeModel].GetBoneTransforms(time.ApplicationElapsedInSeconds(), Transforms, activeAnim);
 
 
             for (unsigned int i = 0; i < Transforms.size(); i++) {
@@ -438,27 +485,110 @@ int main()
         }
         
         // render meshes
-        m.Render(fbxshader);
+        _loadedModels[activeModel].Render(fbxshader);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /* Imgui */
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::Begin("Model Tab");
+        ImGui::Text(("Loaded File: " + _loadedModels[activeModel]._name).c_str());
+
+        if (ImGui::Button("Prev Model"))
+        {
+            activeModel--;
+            activeAnim = 0;
+            if (activeModel < 0)
+            {
+                activeModel = _loadedModels.size() - 1;
+            }
+        }
+        ImGui::SameLine();
+
+        if (ImGui::Button("Next Model"))
+        {
+            activeAnim = 0;
+            activeModel++;
+            if (activeModel > _loadedModels.size() - 1)
+            {
+                activeModel = 0;
+            }
+        }
+        ImGui::Spacing();
+        ImGui::Spacing();
+        ImGui::Spacing();
+        ImGui::Spacing();
+
+        ImGui::Text("Animations in model");
+        ImGui::Spacing();
+        ImGui::Spacing();
+
+        ImGui::BeginChild("Scrolling");
+        for (int n = 0; n < _loadedModels[activeModel].pScene->mNumAnimations; n++)
+        {
+            if (ImGui::Button(_loadedModels[activeModel].pScene->mAnimations[n]->mName.C_Str()))
+            {
+                activeAnim = n;
+            }
+        }
+
+        ImGui::EndChild();
+        ImGui::End();
+
+        ImGui::Begin("Transform Tab");
+
+        ImGui::SliderFloat3("Position", (float*)&(_transforms[activeModel].getPosition()), -10.0f, 10.0f);
+        ImGui::SliderFloat3("Rotation", (float*)&(_transforms[activeModel].getEulerAngles()), 0.0f, 360.0f);
+        ImGui::SliderFloat3("Scale", (float*)&(_transforms[activeModel].getScale()), -10.0f, 10.0f);
+
+        ImGui::End();
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
+
 
         window.NewFrame();
     }
 
-    m.CleanUp();
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
-    for (int i = 0; i < 10; i++)
+    // for (int i = 0; i < 10; i++)
+    // {
+    //     cubes[i].CleanUp();
+    // }
+    //
+    // 
+    for (int i = 0; i < _loadedModels.size(); i++)
     {
-        cubes[i].CleanUp();
+        _loadedModels[i].CleanUp();
     }
-
     for (int i = 0; i < 4; i++)
     {
         lamps[i].CleanUp();
     }
     fbxshader->CleanUp();
-    sp2->CleanUp();
+    // sp2->CleanUp();
     shaderLamp->CleanUp();
     delete fbxshader;
-    delete sp2;
+    // delete sp2;
     delete shaderLamp;
     glfwTerminate();
     return 0;

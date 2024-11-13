@@ -18,6 +18,7 @@ void Model::Init()
 }
 void Model::LoadModel(std::string name)
 {
+	_name = name;
 	Importer = new Assimp::Importer();
 	// this link explains the problem with assimp .fbx importer 
 	// https://github.com/assimp/assimp/issues/4620
@@ -56,7 +57,7 @@ void Model::Render(ShaderProgram* shader)
 {
 	glm::mat4 transform = glm::mat4(1.0f);
 	transform = glm::translate(transform, _pos);
-	transform = glm::scale(transform, _size);
+	transform = glm::scale(transform, _size * glm::vec3(0.01f));
 	//transform = glm::rotate(transform, float(glfwGetTime()) * glm::radians(-45.0f), glm::vec3(0.5f));
 	shader->SetMat4("uTransform", transform);
 	shader->SetInt("uDisplayBoneIndex", activebone);
@@ -66,14 +67,14 @@ void Model::Render(ShaderProgram* shader)
 		var.Render(shader);
 	}
 }
-void Model::GetBoneTransforms(float TimeInSeconds, std::vector<glm::mat4>& Transforms)
+void Model::GetBoneTransforms(float TimeInSeconds, std::vector<glm::mat4>& Transforms, int animidx)
 {
 	float AnimationTimeTicks = TimeInSeconds;
 	if (_hasAnims)
 	{
-		float TicksPerSecond = (float)(pScene->mAnimations[0]->mTicksPerSecond != 0 ? pScene->mAnimations[0]->mTicksPerSecond : 25.0f);
+		float TicksPerSecond = (float)(pScene->mAnimations[animidx]->mTicksPerSecond != 0 ? pScene->mAnimations[animidx]->mTicksPerSecond : 25.0f);
 		float TimeInTicks = TimeInSeconds * TicksPerSecond;
-	    AnimationTimeTicks = fmod(TimeInTicks, (float)pScene->mAnimations[0]->mDuration);
+	    AnimationTimeTicks = fmod(TimeInTicks, (float)pScene->mAnimations[animidx]->mDuration);
 	}
 
 	Transforms.resize(m_BoneInfo.size());
@@ -81,7 +82,7 @@ void Model::GetBoneTransforms(float TimeInSeconds, std::vector<glm::mat4>& Trans
 	aiMatrix4x4 identity = aiMatrix4x4();
 
 
-	ReadNodeHierarchy(AnimationTimeTicks,pScene->mRootNode, identity, 0);
+	ReadNodeHierarchy(AnimationTimeTicks,pScene->mRootNode, identity, 0, animidx);
 
 	for (unsigned int i = 0; i < m_BoneInfo.size(); i++) {
 
@@ -286,7 +287,7 @@ std::vector<Texture> Model::LoadTextures(aiMaterial* mat, aiTextureType type, co
 	return textures;
 }
 
-void Model::ReadNodeHierarchy(float AnimationTime,const aiNode* pNode, const aiMatrix4x4& ParentTransform, int level)
+void Model::ReadNodeHierarchy(float AnimationTime,const aiNode* pNode, const aiMatrix4x4& ParentTransform, int level, int animidx)
 {
 	std::string NodeName(pNode->mName.data);
 
@@ -301,7 +302,7 @@ void Model::ReadNodeHierarchy(float AnimationTime,const aiNode* pNode, const aiM
 
 	if (_hasAnims)
 	{
-		const aiAnimation* pAnimation = pScene->mAnimations[0];
+		const aiAnimation* pAnimation = pScene->mAnimations[animidx];
 		const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, NodeName);
 
 		if (pNodeAnim) {
@@ -345,7 +346,7 @@ void Model::ReadNodeHierarchy(float AnimationTime,const aiNode* pNode, const aiM
 	}
 
 	for (unsigned int i = 0; i < pNode->mNumChildren; i++) {
-		ReadNodeHierarchy(AnimationTime,pNode->mChildren[i], GlobalTransformation, level+1);
+		ReadNodeHierarchy(AnimationTime,pNode->mChildren[i], GlobalTransformation, level+1, animidx);
 	}
 }
 
