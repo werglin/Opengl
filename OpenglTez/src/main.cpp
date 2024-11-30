@@ -338,6 +338,15 @@ int main()
     ImGui_ImplOpenGL3_Init();
     ImGui::StyleColorsDark();
 
+
+    if (_loadedModels[activeModel].pScene->HasAnimations())
+    {
+        activeAnim = 0;
+    }
+    else
+    {
+        activeAnim = -1;
+    }
     
     float frametime = 1.0f / 144.0f; // fixed 144 fps
     float passedtime = 0.0f;
@@ -511,7 +520,14 @@ int main()
         if (ImGui::Button("Prev Model"))
         {
             activeModel--;
-            activeAnim = 0;
+            if (_loadedModels[activeModel].pScene->HasAnimations())
+            {
+                activeAnim = 0;
+            }
+            else
+            {
+                activeAnim = -1;
+            }
             if (activeModel < 0)
             {
                 activeModel = _loadedModels.size() - 1;
@@ -521,32 +537,52 @@ int main()
 
         if (ImGui::Button("Next Model"))
         {
-            activeAnim = 0;
+            
             activeModel++;
             if (activeModel > _loadedModels.size() - 1)
             {
                 activeModel = 0;
             }
-        }
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
-        ImGui::Spacing();
-
-        ImGui::Text("Animations in model");
-        ImGui::Spacing();
-        ImGui::Spacing();
-
-        ImGui::BeginChild("Scrolling");
-        for (int n = 0; n < _loadedModels[activeModel].pScene->mNumAnimations; n++)
-        {
-            if (ImGui::Button(_loadedModels[activeModel].pScene->mAnimations[n]->mName.C_Str()))
+            if (_loadedModels[activeModel].pScene->HasAnimations())
             {
-                activeAnim = n;
+                activeAnim = 0;
+            }
+            else
+            {
+                activeAnim = -1;
             }
         }
 
-        ImGui::EndChild();
+        
+
+        if (_loadedModels[activeModel].pScene->HasAnimations())
+        {
+
+            ImGui::Spacing();
+            ImGui::Spacing();
+            ImGui::Spacing();
+            ImGui::Spacing();
+
+            ImGui::Text("Animations in model");
+            ImGui::Spacing();
+            ImGui::Spacing();
+
+            ImGui::Text(("Animation ID - Name: " + std::to_string(activeAnim) + "  -  " + std::string(_loadedModels[activeModel].pScene->mAnimations[activeAnim]->mName.C_Str())).c_str());
+            ImGui::Spacing();
+            ImGui::Spacing();
+
+            ImGui::BeginChild("Scrolling");
+            for (int n = 0; n < _loadedModels[activeModel].pScene->mNumAnimations; n++)
+            {
+                if (ImGui::Button(_loadedModels[activeModel].pScene->mAnimations[n]->mName.C_Str()))
+                {
+                    activeAnim = n;
+                }
+            }
+
+            ImGui::EndChild();
+        }
+        
         ImGui::End();
 
         ImGui::Begin("Transform Tab");

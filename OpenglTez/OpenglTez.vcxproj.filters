@@ -34,9 +34,9 @@
     <None Include="assets\shaders\fbxshader_fs.glsl" />
     <None Include="assets\fbx\Punching.fbx" />
     <None Include="assets\shaders\fbxshader_vs.glsl" />
-    <None Include="assets\fbx\ggahahaxdlol.fbx" />
     <None Include="assets\fbx\boneehehe.fbx" />
     <None Include="assets\fbx\multianim_2.fbx" />
+    <None Include="assets\fbx\ggahahaxdlol.fbx" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ShaderProgram.hpp">

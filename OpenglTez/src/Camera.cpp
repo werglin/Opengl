@@ -2,6 +2,7 @@
 
 #include<glm/gtc/matrix_transform.hpp>
 
+// starts with initial values
 Camera::Camera(glm::vec3 position)
 	: _camPosition(position),
 	_worldUp(glm::vec3(0.0f, 1.0f, 0.0f)),
